@@ -1,0 +1,16 @@
+{
+  "name": "serverless-aws-node-example",
+  "version": "1.0.0",
+  "repository": "https://github.com/vincen7su/serverless-aws-node-example.git",
+  "author": "vincen7su <31243646+vincen7su@users.noreply.github.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.3",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "serverless-webpack": "^4.4.0",
+    "webpack": "^4.0.1",
+    "webpack-node-externals": "^1.6.0"
+  }
+}
