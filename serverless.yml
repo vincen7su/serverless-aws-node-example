@@ -7,12 +7,17 @@ plugins:
 
 custom:
   webpackIncludeModules: true
+  cognitoUserPoolARN: arn:aws:cognito-idp:ap-northeast-1:XXXXXXXXX:userpool/ap-northeast-1_XXXXXXXXX
   RDSVPC:
     securityGroupIds:
       - sg-xxxxxxxx
     subnetIds:
       - subnet-xxxxxxxx
       - subnet-xxxxxxxx
+  IAMLambdaCloudWatchRoleAction:
+    - logs:CreateLogGroup
+    - logs:CreateLogStream
+    - logs:PutLogEvents
   authorizer:
     name: authorizer
     type: TOKEN
@@ -37,12 +42,12 @@ functions:
   authorizer:
     handler: authorizer.handler
     name: ${ self:service }Authorizer-${ self:provider.stage }
-    description: Authorizer.
+    description: Authorizer
 
   hello:
     handler: hello.handler
     name: ${ self:service }Hello-${ self:provider.stage }
-    description: Get user leave history.
+    description: Hello
     vpc: ${ self:custom.RDSVPC }
     events:
       - http:
@@ -51,6 +56,29 @@ functions:
           private: true
           authorizer: ${ self:custom.authorizer }
 
+  cognitoSignIn:
+    handler: cognitoSignIn.handler
+    name: ${ self:service }CognitoSignIn-${ self:provider.stage }
+    description: Authorize token
+    role: IamRoleLambdaCognitoAdminInitiateAuth
+    events:
+      - http:
+          path: signin
+          method: post
+          private: true
+
+  cognitoAuthHello:
+    handler: cognitoAuthHello.handler
+    name: ${ self:service }CognitoAuthHello-${ self:provider.stage }
+    description: Cognito Auth Hello
+    events:
+      - http:
+          path: cognito-hello
+          method: get
+          private: true
+          authorizer:
+            arn: ${ self:custom.cognitoUserPoolARN }
+
 resources:
   Resources:
     ApiGatewayRestApi:
@@ -58,3 +86,35 @@ resources:
       Properties:
         Name: ${ self:service }-${ self:provider.stage }
         Description: ServerlessExample
+    IamRoleLambdaCognitoAdminInitiateAuth:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${ self:service }-${ self:provider.stage }-cognito-admin-initiate-auth
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        Policies:
+          - PolicyName: AmazonCognitoAdminInitiateAuth
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - cognito-idp:AdminInitiateAuth
+                  Resource: ${ self:custom.cognitoUserPoolARN }
+                - Effect: Allow
+                  Action: ${ self:custom.IAMLambdaCloudWatchRoleAction }
+                  Resource:
+                  - 'Fn::Join':
+                    - ':'
+                    -
+                      - 'arn:aws:logs'
+                      - Ref: 'AWS::Region'
+                      - Ref: 'AWS::AccountId'
