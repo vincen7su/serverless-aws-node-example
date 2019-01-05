@@ -6,7 +6,11 @@ plugins:
   - serverless-webpack
 
 custom:
-  webpackIncludeModules: true
+  webpack:
+    includeModules:
+      forceExclude:
+        - aws-sdk
+    packager: yarn
   cognitoUserPoolARN: arn:aws:cognito-idp:ap-northeast-1:XXXXXXXXX:userpool/ap-northeast-1_XXXXXXXXX
   RDSVPC:
     securityGroupIds:
@@ -26,9 +30,9 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs6.10
-#  stage: dev (default)
+  runtime: nodejs8.10
   region: ap-northeast-1
+  stage: ${ opt:stage, 'dev' }
   apiKeys:
     - ServerlessExample
   memorySize: 128
