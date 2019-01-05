@@ -13,6 +13,6 @@
 
 ## Runtime Environment
 
-Node.js 8.10
-Yarn 1.13.0
-Serverless 1.35.1
+Node.js 8.10  
+Yarn 1.13.0  
+Serverless 1.35.1  

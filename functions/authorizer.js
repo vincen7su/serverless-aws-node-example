@@ -1,3 +1,5 @@
+import { Failure } from 'lib/Response'
+
 const JWT_TOKEN_REGEX = /^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$/
 
 function generatePolicy(principalId, effect, resource, context = {}) {
@@ -26,10 +28,10 @@ export async function handler(event, context, callback) {
     if (JWT_TOKEN_REGEX.test(idToken)) {
       callback(null, generatePolicy('HELLO', 'Allow', event.methodArn, { test: '123' }))
     } else {
-      callback('Unauthorized')
+      return Failure('Unauthorized')
     }
   } catch(error) {
     console.log(error)
-    callback('Unauthorized')
+    return Failure('Unauthorized')
   }
 }
