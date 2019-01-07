@@ -10,6 +10,7 @@
 - Custom IAM Role
 - AWS Cognito User Pool as Authorizer
 - AWS Cognito AuthFlow - ADMIN_NO_SRP_AUTH
+- AWS Lambda publish AWS IoT data
 
 ## Runtime Environment
 
