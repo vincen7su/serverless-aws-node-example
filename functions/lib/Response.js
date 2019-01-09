@@ -4,7 +4,7 @@ const ERROR_CODE_MAP = {
     message: 'Bad Request'
   },
   Unauthorized: {
-    statusCode: 400,
+    statusCode: 401,
     message: 'Unauthorized'
   },
   Forbidden: {
